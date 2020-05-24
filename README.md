@@ -3,7 +3,7 @@ A project to learn modern web development and improve programming skills. Includ
 
 ### WIP
 1. Recipe book
-2. Math tool
+2. Unit conversion tool (restyling)
 
 ### Ideas
 1. Tic Tac Toe
