@@ -1,0 +1,284 @@
+﻿<!doctype html>
+<html lang="en-US">
+	<head>
+		<title>Unit Converter</title>
+		<meta charset="UTF-8">
+		<meta name="description" content="Unit Converter">
+		<meta name="keywords" content="conversion,converter">
+		<meta name="author" content="Stray Wolf">
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+
+		<script>
+		function updateView(){
+		  
+		  if (document.getElementById("length").checked) {
+		    document.getElementById("in-unit").innerHTML = document.getElementById("length-units").innerHTML;
+		  } else {
+		    document.getElementById("in-unit").innerHTML = document.getElementById("weight-units").innerHTML;
+		  }
+		  
+		  document.getElementById("out-unit").innerHTML = document.getElementById("in-unit").innerHTML;
+		}
+
+		const weightTable = 
+		   {  "g g" : 1,           "g kg" : 0.001,        "g mt" : 0.000001,        "g oz" : 0.035274,   "g lbs" : 0.00220462,   "g it" : 0.000000984207, 
+		     "kg g" : 1000,       "kg kg" : 1,           "kg mt" : 0.001,          "kg oz" : 35.274,    "kg lbs" : 2.20462,     "kg it" : 0.000984207, 
+		     "mt g" : 1000000,    "mt kg" : 1000,        "mt mt" : 1,              "mt oz" : 35274,     "mt lbs" : 2204.62,     "mt it" : 0.984207, 
+		     "oz g" : 28.349,     "oz kg" : 0.028349,    "oz mt" : 0.000028349,    "oz oz" : 1,         "oz lbs" : 0.0625,      "oz it" : 0.0000279018, 
+		    "lbs g" : 453.59237, "lbs kg" : 0.45359237, "lbs mt" : 0.00045359237, "lbs oz" : 16,       "lbs lbs" : 1,          "lbs it" : 0.000446429, 
+		     "it g" : 1016047,    "it kg" : 1016.047,    "it mt" : 1.016047,       "it oz" : 35840,     "it lbs" : 2240,        "it it" : 1}
+
+		const lengthTable = 
+		   {"cm cm" : 1,      "cm m" : 0.01,    "cm km" : 0.00001,   "cm in" : 0.393701, "cm ft" : 0.0328084, "cm mi" : 0.0000062137, 
+		     "m cm" : 100,     "m m" : 1,        "m km" : 0.001,      "m in" : 39.3701,   "m ft" : 3.28084,    "m mi" : 0.00062137, 
+		    "km cm" : 100000, "km m" : 1000,    "km km" : 1,         "km in" : 39370.1,  "km ft" : 3280.84,   "km mi" : 0.62137, 
+		    "in cm" : 2.54,   "in m" : 0.0254,  "in km" : 0.0000254, "in in" : 1,        "in ft" : 0.0833333, "in mi" : 0.000015783, 
+		    "ft cm" : 30.48,  "ft m" : 0.3048,  "ft km" : 0.0003048, "ft in" : 12,       "ft ft" : 1,         "ft mi" : 0.000189394, 
+		    "mi cm" : 160934, "mi m" : 1609.34, "mi km" : 1.60934,   "mi in" : 63360,    "mi ft" : 5280,      "mi mi" : 1}
+
+
+		const convertInput = () => {
+		  let inSel = document.getElementById("in-unit");
+		  let outSel = document.getElementById("out-unit");
+		  let inText = inSel.options[inSel.selectedIndex].value;
+		  let outText = outSel.options[outSel.selectedIndex].value;
+		  let pair = `${inText} ${outText}`;
+		  
+		  let factor = (document.getElementById("length").checked ? lengthTable[pair] : weightTable[pair]);
+
+		  document.getElementById("output-text").style.display = 'block';
+		  document.getElementById("output").innerHTML = factor * document.getElementById("input").value;
+		}
+
+		const swapInOutUnits = () => {
+		  let inSel = document.getElementById("in-unit").selectedIndex;
+		  let outSel = document.getElementById("out-unit").selectedIndex;
+		  document.getElementById("in-unit").selectedIndex = outSel;
+		  document.getElementById("out-unit").selectedIndex = inSel;
+		}
+
+		const resetAll = () => {
+		  document.getElementById("input").value = "";
+		  document.getElementById("in-unit").value = "";
+		  document.getElementById("out-unit").value = "";
+		}
+		</script>
+
+		<style>
+			* {
+				padding: 0;
+				margin: 0;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+			}
+
+			body {
+				
+			}
+
+			.wrapper {
+				display: flex;
+				flex-direction: column;
+				text-align: left;
+				align-items: left;
+				margin: 6vh 10vw;
+			}
+
+			.tooltip {
+				position: fixed;
+				display: none;
+			}
+
+
+			h1 {
+				text-align: center;
+				margin-bottom: 4vh;
+			}
+
+			label {
+				font-weight: bold;
+				transform: translateX(0.5vw);
+				margin-top: 1vh;
+			}
+
+
+			div {
+				margin: 2vh 0;
+			}
+
+			button:hover {
+				opacity: 0.8;
+			}
+
+
+			.textfield {
+				font-size: 1em;
+				font-weight: bold;
+				background: #eef;
+				border: 1px solid #888;
+				padding: 1.5vh;
+				margin: 1vh 0;
+				border-radius: 4px;
+				width: 75vw;
+			}
+
+			.textfield:focus {
+				border: 1px solid green;
+				box-shadow: 0px 0px 2px 0px green;
+			}
+
+
+			.measure-section {
+				text-align: center;
+			}
+			.measure-section > span {
+				margin: 0 2vw;
+			}
+			.measure-section > span > input {
+				margin: 0 1vw;
+				transform: translateY(0.2vh);
+			}
+
+			.in-section, .out-section {
+				display: inline-block;
+				width: 34vw;
+			}
+
+			select {
+				font-size: 0.9em;
+				font-weight: bold;
+				background: #fee;
+				border: 1px solid #888;
+				padding: 1.5vh;
+				margin: 1vh 0;
+				border-radius: 4px;
+				width: 100%;
+			}
+
+			.in-out-section button {
+				display: inline-block;
+				color: white;
+				font-size: 1em;
+				font-weight: bold;
+				border: 1px solid #ccc;
+				padding: 1.5vh;
+				margin: 0 1vw;
+				border-radius: 8vw;
+				background: #db074e;
+
+			}
+
+			.button-section {
+				margin: 4vh 0;
+			}
+
+			.button-section > button {
+				color: white;
+				font-size: 1em;
+				font-weight: bold;
+				letter-spacing: 0.025em;
+				border: 1px solid #ccc;
+				padding: 1.5vh;
+				margin: 0.5vh 0;
+				border-radius: 4px;
+				width: 80vw;
+			}
+
+			.button-section button:nth-child(1) {
+				background: #07db51;
+			}
+
+			.button-section button:nth-child(2) {
+				background: #db4e07;
+			}
+
+			.output-section {
+				padding: 0 2vw;
+			}
+
+			.output-section p {
+				background: #ddf;
+				padding: 2vh 2vw;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div class="wrapper">
+
+			<h1>Unit Converter</h1>
+			<p class="tooltip">Please enter a numeric value, select the measure, and select the input and output units. </p><br>
+
+
+
+			<div class="input-section">
+				<label for="input">Input</label>
+				<br />
+				<input class="textfield" type="text" size=10" name="input" id="input" required />
+			</div>
+
+
+			<div class="measure-section">
+				<span class="measure1">
+					<label for="length">Length</label>
+					<input type="radio" name="measure" value="length" id="length" onclick="updateView()" />
+				</span>
+
+				<span class="measure2">
+					<label for="mass">Mass</label>
+					<input type="radio" name="measure" value="mass" onclick="updateView()">
+				</span>
+			</div>
+
+
+			<div class="in-out-section">
+				<span class="in-section">
+					<label for="in-unit">Input unit</label>
+					<br />
+					<select name="in-unit" id="in-unit"></select>
+				</span>
+
+				<button type="button" name="swap" onclick="swapInOutUnits()">⇄</button>
+
+				<span class="out-section">
+					<label for="out-unit">Output unit</label>
+					<br />
+					<select name="out-unit" id="out-unit"></select>
+				</span>
+			</div>
+
+			<div class="button-section">
+				<button type="button" name="convert" onclick="convertInput()">Convert</button>
+				<button type="button" name="reset" onclick="resetAll()">Reset</button>
+			</div>
+
+
+			<div class="output-section">
+				<p name="output" style="display: none;" id="output-text">
+					<strong>
+						Output: <span id="output" />
+					</strong>
+				</p>
+			</div>
+
+
+			<p name="length-units" style="display: none;" id="length-units">
+			  <option value="cm">centimeter (cm) </option>
+			  <option value="m">meter (m) </option>
+			  <option value="km">kilometer (km) </option>
+			  <option value="in">inch (in)</option>
+			  <option value="ft">foot (ft)</option>
+			  <option value="mi">mile (mi)</option>
+			</p>
+
+			<select name="weight-units" style="display: none;" id="weight-units">
+			  <option value="g">gram (g)</option>
+			  <option value="kg">kilogram (kg)</option>
+			  <option value="mt">metric ton (mt)</option>
+			  <option value="oz">ounce (oz)</option>
+			  <option value="lbs">pound (lbs)</option>
+			  <option value="it">imperial ton (it)</option>
+			</select>
+		</div>
+	</body>
+</html>
