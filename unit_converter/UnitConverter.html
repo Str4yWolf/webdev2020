@@ -5,21 +5,10 @@
 		<meta charset="UTF-8">
 		<meta name="description" content="Unit Converter">
 		<meta name="keywords" content="conversion,converter">
-		<meta name="author" content="Stray Wolf">
+		<meta name="author" content="Michael Woei Kang Huang">
 		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
 
 		<script>
-		function updateView(){
-		  
-		  if (document.getElementById("length").checked) {
-		    document.getElementById("in-unit").innerHTML = document.getElementById("length-units").innerHTML;
-		  } else {
-		    document.getElementById("in-unit").innerHTML = document.getElementById("weight-units").innerHTML;
-		  }
-		  
-		  document.getElementById("out-unit").innerHTML = document.getElementById("in-unit").innerHTML;
-		}
-
 		const weightTable = 
 		   {  "g g" : 1,           "g kg" : 0.001,        "g mt" : 0.000001,        "g oz" : 0.035274,   "g lbs" : 0.00220462,   "g it" : 0.000000984207, 
 		     "kg g" : 1000,       "kg kg" : 1,           "kg mt" : 0.001,          "kg oz" : 35.274,    "kg lbs" : 2.20462,     "kg it" : 0.000984207, 
@@ -36,31 +25,36 @@
 		    "ft cm" : 30.48,  "ft m" : 0.3048,  "ft km" : 0.0003048, "ft in" : 12,       "ft ft" : 1,         "ft mi" : 0.000189394, 
 		    "mi cm" : 160934, "mi m" : 1609.34, "mi km" : 1.60934,   "mi in" : 63360,    "mi ft" : 5280,      "mi mi" : 1}
 
+		document.addEventListener("DOMContentLoaded", () => {
+			updateView('length');
+			document.getElementById("input").focus();
+		});
+
+		const updateView = unit => {
+			let targetUnit = unit + '-units'; 
+		  
+		    document.getElementById("in-unit").innerHTML = document.getElementById(targetUnit).innerHTML;
+		 	document.getElementById("out-unit").innerHTML = document.getElementById(targetUnit).innerHTML;
+		}
 
 		const convertInput = () => {
-		  let inSel = document.getElementById("in-unit");
-		  let outSel = document.getElementById("out-unit");
-		  let inText = inSel.options[inSel.selectedIndex].value;
-		  let outText = outSel.options[outSel.selectedIndex].value;
-		  let pair = `${inText} ${outText}`;
+		  	let inSel = document.getElementById("in-unit");
+		 	let outSel = document.getElementById("out-unit");
+		  	let inText = inSel.options[inSel.selectedIndex].value;
+		  	let outText = outSel.options[outSel.selectedIndex].value;
+		  	let pair = `${inText} ${outText}`;
 		  
-		  let factor = (document.getElementById("length").checked ? lengthTable[pair] : weightTable[pair]);
+		  	let factor = (document.getElementById("length").checked ? lengthTable[pair] : weightTable[pair]);
 
-		  document.getElementById("output-text").style.display = 'block';
-		  document.getElementById("output").innerHTML = factor * document.getElementById("input").value;
+		  	document.getElementById("output-text").style.display = 'block';
+		  	document.getElementById("output").innerHTML = factor * document.getElementById("input").value;
 		}
 
 		const swapInOutUnits = () => {
-		  let inSel = document.getElementById("in-unit").selectedIndex;
-		  let outSel = document.getElementById("out-unit").selectedIndex;
-		  document.getElementById("in-unit").selectedIndex = outSel;
-		  document.getElementById("out-unit").selectedIndex = inSel;
-		}
-
-		const resetAll = () => {
-		  document.getElementById("input").value = "";
-		  document.getElementById("in-unit").value = "";
-		  document.getElementById("out-unit").value = "";
+		  	let inSel = document.getElementById("in-unit").selectedIndex;
+		  	let outSel = document.getElementById("out-unit").selectedIndex;
+		  	document.getElementById("in-unit").selectedIndex = outSel;
+		  	document.getElementById("out-unit").selectedIndex = inSel;
 		}
 		</script>
 
@@ -75,6 +69,7 @@
 			}
 
 			.wrapper {
+				max-width: 1000px;
 				display: flex;
 				flex-direction: column;
 				text-align: left;
@@ -102,6 +97,7 @@
 
 			div {
 				margin: 2vh 0;
+				max-width: 1000px;
 			}
 
 			button:hover {
@@ -162,12 +158,13 @@
 				padding: 1.5vh;
 				margin: 0 1vw;
 				border-radius: 8vw;
-				background: #db074e;
+				background: #db4e07;
 
 			}
 
 			.button-section {
 				margin: 4vh 0;
+				max-width: 1000px;
 			}
 
 			.button-section > button {
@@ -186,9 +183,6 @@
 				background: #07db51;
 			}
 
-			.button-section button:nth-child(2) {
-				background: #db4e07;
-			}
 
 			.output-section {
 				padding: 0 2vw;
@@ -213,19 +207,25 @@
 			<div class="input-section">
 				<label for="input">Input</label>
 				<br />
-				<input class="textfield" type="text" size=10" name="input" id="input" required />
+				<input
+					class="textfield"
+					type="text"
+					name="input"
+					id="input"
+					pattern="\d{1,20}"
+					required />
 			</div>
 
 
 			<div class="measure-section">
 				<span class="measure1">
 					<label for="length">Length</label>
-					<input type="radio" name="measure" value="length" id="length" onclick="updateView()" />
+					<input type="radio" name="measure" value="length" id="length" onclick="updateView('length')" checked required />
 				</span>
 
 				<span class="measure2">
 					<label for="mass">Mass</label>
-					<input type="radio" name="measure" value="mass" onclick="updateView()">
+					<input type="radio" name="measure" value="mass" onclick="updateView('weight')">
 				</span>
 			</div>
 
@@ -248,7 +248,6 @@
 
 			<div class="button-section">
 				<button type="button" name="convert" onclick="convertInput()">Convert</button>
-				<button type="button" name="reset" onclick="resetAll()">Reset</button>
 			</div>
 
 
