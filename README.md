@@ -3,14 +3,14 @@ A project to learn modern web development and improve programming skills. Includ
 
 ### 1st version done
 1. Unit Converter
+2. Tic Tac Toe [demo (desktop)](https://str4ywolf.github.io/tic-tac-toe/)[code](https://github.com/Str4yWolf/tic-tac-toe)
 
 ### WIP
 1. Recipe book
 
 
 ### Ideas
-1. Tic Tac Toe
-2. Calculator
-3. 2048 + variations (standalone?)
-4. characters + side input (standalone?)
-5. recipher (standalone)
+1. Calculator
+2. 2048 + variations (standalone?)
+3. characters + side input (standalone?)
+4. recipher (standalone)
