@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
-    <!-- <script defer src="http://localhost:3000/socket.io/socket.io.js"></script> -->
-    <script src="./script.js"></script>
+    <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script defer src="./script.js"></script>
     <style>
         :root {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -19,6 +19,10 @@
         }
         main {
             border: 1px solid #ccc;
+            width: 260px;
+            max-height: 60vh;
+            overflow-y: auto;
+            scrollbar-width: 0;
         }
         h3 { text-align: center }
         
@@ -33,19 +37,19 @@
             border: 1px solid #bbb;
             background: white;
             width: 80%;
-            align-self: end;
+            align-self: start;
             margin: 0.5rem 0;
-            border-radius: 0 0 0 10px;
+            border-radius: 0 0 10px 0;
             padding: 0.5rem;
         }
         .chat-container > div h6 { margin: 0 }
         .chat-container > div p { margin: 0 }
 
         .chat-container > div.own {
-            align-self: start;
+            align-self: end;
             background-color: #cfc;
             border: 1px solid #bbb;
-            border-radius: 0 0 10px 0;
+            border-radius: 0 0 0 10px;
         }
         .input-field-container {
             background: #ddd;

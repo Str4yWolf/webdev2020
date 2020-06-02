@@ -1,29 +1,36 @@
-//const socket = io('http://localhost:3000')
+const socket = io('http://localhost:3000')
 let messageContainer;
 let messageBtn;
 let messageInput;
+let userColor;
 
+const COLORS = ['red', 'green', 'blue', 'purple', 'orange'];
+const getRandomColor = () => {
+    let randomIndex = Math.floor(Math.random() * COLORS.length);
+    return COLORS[randomIndex];
+}
 
 const myName = prompt("What's your name?")
 
-// socket.emit('new-user', name)
+socket.emit('new-user', myName)
 
-// socket.on('welcome-message', data => {
-//     appendMessage(data)
-// })
+socket.on('welcome-message', data => {
+    appendMessage(data)
+})
 
-// socket.on('user-connected', name => {
-//     appendMessage(`${name} joined`)
-// })
+socket.on('user-connected', name => {
+    appendMessage({message: `${name} joined`})
+})
 
-// socket.on('user-disconnected', name => {
-//     appendMessage(`${name} has left the chat`)
-// })
+socket.on('chat-messsage', data => {
+    appendMessage(data)
+})
+
+socket.on('user-disconnected', name => {
+    appendMessage({message: `${name} has left the chat`})
+})
 
 
-// socket.on('chat-message', data => {
-//     appendMessage(data)
-// })
 
 
 
@@ -33,6 +40,7 @@ const appendMessage = ({name="System", message}) => {
     const pElement = document.createElement('p');
 
     h6Element.innerText = name ? name : myName;
+    h6Element.style.color = userColor;
 
     if (!name) messageElement.classList.add('own');
 
@@ -44,13 +52,14 @@ const appendMessage = ({name="System", message}) => {
 }
 
 const sendMessage = () => {
+    messageInput.focus();
+    
     if (messageInput.value === '') return;
+
     const message = messageInput.value;
     appendMessage({name: '', message: `${message}`});
-    //socket.emit('send-chat-message', message)
+    socket.emit('send-chat-message', message)
     messageInput.value = '';
-    
-    messageInput.focus();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -60,11 +69,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
     appendMessage({message: `You joined`});
 
-    messageBtn.addEventListener("click", sendMessage);
+    messageBtn.addEventListener("click", () => sendMessage());
 
     messageInput.addEventListener("keydown", e => {
         if (e.code === 'Enter') sendMessage();
     })
+
+    userColor = getRandomColor();
 
     messageInput.focus();
 })
