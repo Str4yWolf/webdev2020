@@ -1,4 +1,7 @@
-const io = require('socket.io')(3000)
+const express = require('express')
+const app = express()
+const server = require('http').Server(app)
+const io = require('socket.io')(server)
 
 const users = {}
 io.on('connection'), socket => {
