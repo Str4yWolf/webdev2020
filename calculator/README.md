@@ -8,4 +8,5 @@ Standalone HTML file
 HTML5, CSS3, VanillaJS
 
 ### TODO
+WIP
 
