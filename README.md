@@ -9,10 +9,10 @@ A project to learn modern web development and improve programming skills. Includ
 
 ### WIP
 1. Recipe book
+2. Calculator
 
 
 ### Ideas
-1. Calculator
-2. 2048 + variations (standalone?)
-3. characters + side input (standalone?)
-4. recipher (standalone)
+1. 2048 sliding puzzle + variations (standalone?)
+2. Chinese characters learning app + side input (standalone?)
+3. recipher (standalone) (flash card like)
