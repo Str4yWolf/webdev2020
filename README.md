@@ -4,6 +4,8 @@ A project to learn modern web development and improve programming skills. Includ
 ### 1st version done
 1. Unit Converter
 2. Tic Tac Toe [demo (desktop)](https://str4ywolf.github.io/tic-tac-toe/) | [code](https://github.com/Str4yWolf/tic-tac-toe)
+3. Chat
+
 
 ### WIP
 1. Recipe book
