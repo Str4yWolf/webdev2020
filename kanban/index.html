@@ -5,13 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kanban</title>
     <script defer>
+        const COLS = ["to-do-col", "in-progress-col", "done-col"]
+        let issueCount = 0
+        
         document.addEventListener('DOMContentLoaded', () => {
 
             getElById('new-issue-input').addEventListener('keypress', e => {
                 if (e.code === 'Enter') onSubmit()
             })
 
-            getElById('new-issue-btn').addEventListener('onclick', () => onSubmit())
+            getElById('new-issue-btn').addEventListener('click', () => onSubmit())
+
+            COLS.forEach(col => {
+                getElById(col).addEventListener("drop", ev => drop(ev))
+                getElById(col).addEventListener("dragover", ev => ev.preventDefault())
+            })
         })
 
         const onSubmit = () => {
@@ -24,10 +32,26 @@
 
         const createNewIssue = text => {
             let container = document.createElement('div')
-            container.classList.add('issue-card')
-            container.innerText = text
 
+            container.classList.add('issue-card')
+            container.setAttribute("id", "issue-" + issueCount++)
+            container.innerText = text
+            container.setAttribute("draggable", true)
+            container.addEventListener("dragstart", e => drag(e))
+            
             getElById('to-do-col').appendChild(container)
+        }
+
+        const drag = ev => {
+            console.log('drag')
+            ev.dataTransfer.setData("text", ev.target.id)
+        }
+
+        const drop = ev => {
+            console.log('drop')
+            ev.preventDefault()
+            let data = ev.dataTransfer.getData("text")
+            ev.target.appendChild(getElById(data))
         }
     </script>
     <style>
@@ -93,12 +117,19 @@
             border-left: 1px solid #ddd;
         }
 
+
         .issue-card {
             background: white;
             border: 1px solid #888;
             color: black;
             margin: 0.25rem;
             padding: 0.5rem;
+        }
+        .issue-card:hover {
+            cursor: grab;
+        }
+        .issue-card:drop {
+            cursor: grabbing;
         }
     </style>
 </head>
