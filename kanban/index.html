@@ -15,22 +15,61 @@
             })
 
             getElById('new-issue-btn').addEventListener('click', () => onSubmit())
+            
+            getElById('save-btn').addEventListener('click', () => saveData())
 
             COLS.forEach(col => {
                 getElById(col).addEventListener("drop", ev => drop(ev))
                 getElById(col).addEventListener("dragover", ev => ev.preventDefault())
             })
+
+            getElById('trash').addEventListener("drop", ev => drop(ev))
+                getElById('trash').addEventListener("dragover", ev => ev.preventDefault())
+
+            loadData()
         })
+
+        const loadData = () => {
+            let kanban = JSON.parse(localStorage.getItem('kanban'))
+            if (kanban === null) return
+            kanban.forEach((col, idx) => {
+                col.forEach(issue => {
+                    createIssue(issue, COLS[idx])
+                })
+            })
+            removeSaveMessage()
+        }
+
+        const saveData = () => {
+            let kanban = COLS.map(col => {
+                let divs = Array.from(getElById(col).childNodes)
+                let issueTexts = divs.map(div => div.innerText)
+                return issueTexts
+            })
+            localStorage.setItem('kanban', JSON.stringify(kanban))
+            removeSaveMessage()
+        }
+
+        const addSaveMessage = () => {
+            removeSaveMessage()
+            let message = createMessage('* You have unsaved changes', 'red')
+            getElById('message-box').innerHTML = ''
+            getElById('message-box').appendChild(message)
+
+        }
+        const removeSaveMessage = () => [
+            getElById('message-box').innerHTML = ''
+        ]
 
         const onSubmit = () => {
             let newIssueInput = getElById('new-issue-input')
-            createNewIssue(newIssueInput.value)
+            createIssue(newIssueInput.value)
             newIssueInput.value = ""
         }
         
         const getElById = id => document.getElementById(id)
 
-        const createNewIssue = text => {
+        const createIssue = (text, target='to-do-col') => {
             let container = document.createElement('div')
 
             container.classList.add('issue-card')
@@ -38,20 +77,51 @@
             container.innerText = text
             container.setAttribute("draggable", true)
             container.addEventListener("dragstart", e => drag(e))
-            
-            getElById('to-do-col').appendChild(container)
+
+            getElById(target).appendChild(container)
+
+            addSaveMessage()
+        }
+
+        const createMessage = (text, color) => {
+            let container = document.createElement('div')
+            container.classList.add('message')
+            container.style.color = color
+            container.innerHTML = text
+            return container
         }
 
         const drag = ev => {
-            console.log('drag')
             ev.dataTransfer.setData("text", ev.target.id)
         }
 
+        const isCol = id => {
+            if (typeof id !== 'string') return false
+            if (id.split('-').reverse()[0] === 'col') return true
+        }
+
+        const isTrash = id => {
+            if (typeof id !== 'string') return false
+            if (id === 'trash') return true
+        }
+
         const drop = ev => {
-            console.log('drop')
             ev.preventDefault()
             let data = ev.dataTransfer.getData("text")
-            ev.target.appendChild(getElById(data))
+
+            if (isCol(ev.target.id)) {
+                ev.target.appendChild(getElById(data))
+            } else if (isCol(ev.target.parentNode.id)) {
+                ev.target.parentNode.appendChild(getElById(data))
+            } else if (isTrash(ev.target.id)) {
+                deleteElement(data)
+            }
+            addSaveMessage()
+        }
+
+        const deleteElement = id => {
+            getElById(id).remove()
+            addSaveMessage()
         }
     </script>
     <style>
@@ -90,6 +160,17 @@
         button:hover {
             cursor: pointer;
             opacity: 0.8;
+        }
+        .trash {
+            background: red;
+            border: 1px solid red;
+            color: white;
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 4vh 0;
+            padding: 0.25rem 0.5rem;
+            text-align: center;
         }
         .board {
             background: #eee;
@@ -139,6 +220,8 @@
             <label for="new-issue">Create</label>
             <input id="new-issue-input" name="new-issue" type="text">
             <button id="new-issue-btn" type="button">+</button>
+            <button id="save-btn" type="button">SAVE</button>
+            <div id="message-box"></div>
         </div>
         <div class="board">
             <span>To Do</span>
@@ -148,6 +231,7 @@
             <div id="in-progress-col" class="in-progress-col"></div>
             <div id="done-col" class="done-col"></div>
         </div>
+        <div id="trash" class="trash">Drag & Trash</div>
     </main>
 </body>
 </html>
