@@ -10,6 +10,7 @@ A project to learn modern web development and improve programming skills. Includ
 ### WIP
 1. Recipe book
 2. Calculator
+3. AchievementsList
 
 
 ### Ideas
