@@ -1,237 +1,364 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban</title>
-    <script defer>
-        const COLS = ["to-do-col", "in-progress-col", "done-col"]
-        let issueCount = 0
-        
-        document.addEventListener('DOMContentLoaded', () => {
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kanban</title>
 
-            getElById('new-issue-input').addEventListener('keypress', e => {
-                if (e.code === 'Enter') onSubmit()
-            })
 
-            getElById('new-issue-btn').addEventListener('click', () => onSubmit())
-            
-            getElById('save-btn').addEventListener('click', () => saveData())
+        <script defer>
 
-            COLS.forEach(col => {
-                getElById(col).addEventListener("drop", ev => drop(ev))
-                getElById(col).addEventListener("dragover", ev => ev.preventDefault())
-            })
+            /* globals */
+            const COLS = ["to-do-col", "in-progress-col", "done-col"]
+            const LOCAL_STORAGE_KEY = "kanban"
+            let issueCount = 0
 
-            getElById('trash').addEventListener("drop", ev => drop(ev))
-                getElById('trash').addEventListener("dragover", ev => ev.preventDefault())
 
-            loadData()
-        })
+            /* app setup */
+            document.addEventListener("DOMContentLoaded", () => {
 
-        const loadData = () => {
-            let kanban = JSON.parse(localStorage.getItem('kanban'))
-            if (kanban === null) return
-            kanban.forEach((col, idx) => {
-                col.forEach(issue => {
-                    createIssue(issue, COLS[idx])
+                // submit event listeners
+                getElById("new-issue-input").addEventListener("keypress", e => {
+                    if (e.code === "Enter") onSubmit()
                 })
+
+                getElById("new-issue-btn").addEventListener("click", () => onSubmit())
+                
+                getElById("save-btn").addEventListener("click", () => saveData())
+
+                // drag event listeners
+                COLS.forEach(col => {
+                    getElById(col).addEventListener("drop", ev => drop(ev))
+                    getElById(col).addEventListener("dragover", ev => ev.preventDefault())
+                })
+
+                getElById("trash").addEventListener("drop", ev => drop(ev))
+                    getElById("trash").addEventListener("dragover", ev => ev.preventDefault())
+
+                // load user data
+                loadData()
             })
-            removeSaveMessage()
-        }
 
-        const saveData = () => {
-            let kanban = COLS.map(col => {
-                let divs = Array.from(getElById(col).childNodes)
-                let issueTexts = divs.map(div => div.innerText)
-                return issueTexts
-            })
-            localStorage.setItem('kanban', JSON.stringify(kanban))
-            removeSaveMessage()
-        }
 
-        const addSaveMessage = () => {
-            removeSaveMessage()
-            let message = createMessage('* You have unsaved changes', 'red')
-            getElById('message-box').innerHTML = ''
-            getElById('message-box').appendChild(message)
+            /* syntactic simplification */
+            const getElById = id => document.getElementById(id)
 
-        }
-        const removeSaveMessage = () => [
-            getElById('message-box').innerHTML = ''
-        ]
 
-        const onSubmit = () => {
-            let newIssueInput = getElById('new-issue-input')
-            createIssue(newIssueInput.value)
-            newIssueInput.value = ""
-        }
-        
-        const getElById = id => document.getElementById(id)
+            /**
+            *   Loads user data from local storage to HTML, using the LOCAL_STORAGE_KEY. 
+            */
+            const loadData = () => {
+                let kanban = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
+                if (kanban === null) return
 
-        const createIssue = (text, target='to-do-col') => {
-            let container = document.createElement('div')
+                // load by column and issue
+                kanban.forEach((col, idx) => {
+                    col.forEach(issue => {
+                        createIssue(issue, COLS[idx])
+                    })
+                })
 
-            container.classList.add('issue-card')
-            container.setAttribute("id", "issue-" + issueCount++)
-            container.innerText = text
-            container.setAttribute("draggable", true)
-            container.addEventListener("dragstart", e => drag(e))
-
-            getElById(target).appendChild(container)
-
-            addSaveMessage()
-        }
-
-        const createMessage = (text, color) => {
-            let container = document.createElement('div')
-            container.classList.add('message')
-            container.style.color = color
-            container.innerHTML = text
-            return container
-        }
-
-        const drag = ev => {
-            ev.dataTransfer.setData("text", ev.target.id)
-        }
-
-        const isCol = id => {
-            if (typeof id !== 'string') return false
-            if (id.split('-').reverse()[0] === 'col') return true
-        }
-
-        const isTrash = id => {
-            if (typeof id !== 'string') return false
-            if (id === 'trash') return true
-        }
-
-        const drop = ev => {
-            ev.preventDefault()
-            let data = ev.dataTransfer.getData("text")
-
-            if (isCol(ev.target.id)) {
-                ev.target.appendChild(getElById(data))
-            } else if (isCol(ev.target.parentNode.id)) {
-                ev.target.parentNode.appendChild(getElById(data))
-            } else if (isTrash(ev.target.id)) {
-                deleteElement(data)
+                // clear save message as issues are not created manually here
+                removeSaveMessage()
             }
-            addSaveMessage()
-        }
 
-        const deleteElement = id => {
-            getElById(id).remove()
-            addSaveMessage()
-        }
-    </script>
-    <style>
-        :root {
-            box-sizing: border-box;
-            font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            margin: 0;
-            padding: 0;
-            word-wrap: break-word;
-        }
-        main {
-            display: flex;
-            flex-direction: column;
-            margin: 2vh 10vw;
-        }
-        .top {
-            flex: 1;
-            padding: 1rem;
-        }
-        label {
-            font-weight: bold;
-            margin: 1rem;
-        }
-        input[type="text"] {
-            padding: 0.51rem 1rem;
-        }
-        button {
-            background: darkgreen;
-            border: 1px solid darkgreen;
-            color: white;
-            font-size: 1.25rem;
-            font-weight: bold;
-            padding: 0.25rem 0.5rem;
-            transform: translate3d(-5px, 2px, 0);
-        }
-        button:hover {
-            cursor: pointer;
-            opacity: 0.8;
-        }
-        .trash {
-            background: red;
-            border: 1px solid red;
-            color: white;
-            display: inline-block;
-            font-size: 1rem;
-            font-weight: bold;
-            margin: 4vh 0;
-            padding: 0.25rem 0.5rem;
-            text-align: center;
-        }
-        .board {
-            background: #eee;
-            display: grid;
-            flex: 4;
-            grid-template: 3rem auto / repeat(3, 1fr);
-        }
-        .board > * {
-            padding: 0.5rem;
-        }
-        .board > span {
-            background: darkorchid;
-            color: white;
-            border-bottom: 4px solid lightblue;
-            font-weight: bold;
-        }
-        .board > div:not(:first-child):not(:last-child) {
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-        }
-        .board > div:first-child {
-            border-right: 1px solid #ddd;
-        }
-        .board > div:last-child {
-            border-left: 1px solid #ddd;
-        }
+            /**
+            *   Save user data from HTML to local storage, using the LOCAL_STORAGE_KEY
+            */
+            const saveData = () => {
+                // get text from all issues, grouped by columns
+                let kanban = COLS.map(col => {
+                    let divs = Array.from(getElById(col).childNodes)
+                    let issueTexts = divs.map(div => div.innerText)
+                    return issueTexts
+                })
+
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(kanban))
+
+                // remove save message as we have saved the data
+                removeSaveMessage()
+            }
 
 
-        .issue-card {
-            background: white;
-            border: 1px solid #888;
-            color: black;
-            margin: 0.25rem;
-            padding: 0.5rem;
-        }
-        .issue-card:hover {
-            cursor: grab;
-        }
-        .issue-card:drop {
-            cursor: grabbing;
-        }
-    </style>
-</head>
-<body>
-    <main>
-        <div class="top">
-            <label for="new-issue">Create</label>
-            <input id="new-issue-input" name="new-issue" type="text">
-            <button id="new-issue-btn" type="button">+</button>
-            <button id="save-btn" type="button">SAVE</button>
-            <div id="message-box"></div>
-        </div>
-        <div class="board">
-            <span>To Do</span>
-            <span>In Progress</span>
-            <span>Done</span>
-            <div id="to-do-col" class="to-do-col"></div>
-            <div id="in-progress-col" class="in-progress-col"></div>
-            <div id="done-col" class="done-col"></div>
-        </div>
-        <div id="trash" class="trash">Drag & Trash</div>
-    </main>
-</body>
+            /**
+            *   Add a save message to the HTML.
+            */
+            const addSaveMessage = () => {
+                // prevent spawning multiple save messages
+                removeSaveMessage()
+
+                let message = createMessage("* You have unsaved changes", "red")
+                getElById("message-box").innerHTML = ""
+                getElById("message-box").appendChild(message)
+
+            }
+
+            /**
+            *   Remove save message shown in element with id 'message-box'
+            */
+            const removeSaveMessage = () => [
+                getElById("message-box").innerHTML = ""
+            ]
+
+
+            /**
+            *   Generate a new issue card.
+            *   @param <string> text - Content of the issue.
+            *   @param <string> [target = COLS[0]] - id specification of target column.
+            */
+            const createIssue = (text, target = COLS[0]) => {
+                let container = document.createElement("div")
+
+                container.classList.add("issue-card")
+                container.setAttribute("id", "issue-" + issueCount++)
+                container.innerText = text
+                container.setAttribute("draggable", true)
+                container.addEventListener("dragstart", e => drag(e))
+
+                getElById(target).appendChild(container)
+
+                addSaveMessage()
+            }
+
+            /**
+            *   Creates a text message element.
+            *   @param <string> text - The message content.
+            *   @param <string> [color = "black"] - The color of the text.
+            *   @return <HTML object> A div of class 'message' containing the colored text.
+            */
+            const createMessage = (text, color="black") => {
+                let container = document.createElement("div")
+                container.classList.add("message")
+                container.style.color = color
+                container.innerHTML = text
+                return container
+            }
+
+            // delete element by id
+            const deleteElement = id => {
+                getElById(id).remove()
+                // remind user to save
+                addSaveMessage()
+            }
+
+
+            
+            /* Helper predicates */
+            const isCol = id => {
+                if (typeof id !== "string") return false
+                if (id.split("-").reverse()[0] === "col") return true
+            }
+
+            const isTrash = id => {
+                if (typeof id !== "string") return false
+                if (id === "trash") return true
+            }
+
+
+            /* drag and drop */
+            // drag function
+            const drag = ev => {
+                ev.dataTransfer.setData("text", ev.target.id)
+            }
+
+            // drop function with target check
+            const drop = ev => {
+                ev.preventDefault()
+                let data = ev.dataTransfer.getData("text")
+
+                // dragging on column
+                if (isCol(ev.target.id)) {
+                    ev.target.appendChild(getElById(data))
+                // dragging on issue that is a child of a column
+                } else if (isCol(ev.target.parentNode.id)) {
+                    ev.target.parentNode.appendChild(getElById(data))
+                // dragging on trash can
+                } else if (isTrash(ev.target.id)) {
+                    deleteElement(data)
+                }
+
+                // remind user that something has changed
+                addSaveMessage()
+            }
+
+
+            const onSubmit = () => {
+                let newIssueInput = getElById("new-issue-input")
+                createIssue(newIssueInput.value)
+                newIssueInput.value = ""
+            }
+
+        </script>
+
+
+        <style>
+            :root {
+                box-sizing: border-box;
+                font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                margin: 0;
+                padding: 0;
+                word-wrap: break-word;
+
+                --col-size: 3;
+
+                --primary-color: darkorchid;
+                --secondary-color: lightblue;
+                --create-color: darkgreen;
+                --delete-color: red;
+
+                --column-content-border: 1px solid #ddd;
+            }
+
+            main {
+                display: flex;
+                flex-direction: column;
+                margin: 2vh 10vw;
+            }
+
+
+
+            .top {
+                flex: 1;
+                padding: 1rem;
+            }
+
+            label {
+                font-weight: bold;
+                margin: 1rem;
+            }
+
+            input[type="text"] {
+                padding: 0.51rem 1rem;
+            }
+
+            button {
+                background: var(--create-color);
+                border: 1px solid var(--create-color);
+                color: white;
+                font-size: 1.25rem;
+                font-weight: bold;
+                padding: 0.25rem 0.5rem;
+                transform: translate3d(-5px, 2px, 0);
+            }
+            button:hover {
+                cursor: pointer;
+                opacity: 0.8;
+            }
+
+            .message {
+                padding: 0.5rem;
+            }
+
+
+            
+            .board {
+                background: #eee;
+                display: grid;
+                flex: 4;
+                grid-template: auto auto / repeat(var(--col-size), calc(100% / var(--col-size)));
+            }
+
+            .board > * {
+                padding: 0.5rem;
+            }
+
+            .board > span {
+                background: var(--primary-color);
+                border-bottom: 4px solid var(--secondary-color);
+                color: white;
+                font-weight: bold;
+                padding: 0.75rem;
+            }
+
+            .board > div:not(:first-child):not(:last-child) {
+                border-left: var(--column-content-border);
+                border-right: var(--column-content-border);
+            }
+
+            .board > div:first-child {
+                border-right: var(--column-content-border);
+            }
+
+            .board > div:last-child {
+                border-left: var(--column-content-border);
+            }
+
+
+            .issue-card {
+                background: white;
+                border: 1px solid #888;
+                color: black;
+                margin: 0.25rem;
+                padding: 0.5rem;
+            }
+            .issue-card:hover {
+                cursor: grab;
+            }
+            
+
+
+            .trash {
+                background: var(--delete-color);
+                border: 1px solid var(--delete-color);
+                color: white;
+                display: inline-block;
+                font-size: 1rem;
+                font-weight: bold;
+                margin: 4vh 0;
+                padding: 0.25rem 0.5rem;
+                text-align: center;
+            }
+
+
+
+
+            @media screen and (max-width: 768px) {
+                :root {
+                    font-size: 12px;
+                }
+
+                .top > *:not(button) {
+                    margin: 0.5rem;
+                }
+            }
+
+
+            @media screen and (max-width: 500px) {
+                #save-btn {
+                    margin: 0 5%;
+                    width: 90%;
+                }
+            }
+            
+        </style>
+    </head>
+
+    <body>
+        <main>
+
+            <!-- UI for issue creation / save function -->
+            <div class="top">
+                <label for="new-issue">Create</label>
+                <input id="new-issue-input" name="new-issue" type="text">
+                <button id="new-issue-btn" type="button">+</button>
+
+                <button id="save-btn" type="button">SAVE</button>
+                <div id="message-box"></div>
+            </div>
+
+            <!-- Kanban board with column headers and actual column areas -->
+            <div class="board">
+                <span>To Do</span>
+                <span>In Progress</span>
+                <span>Done</span>
+
+                <div id="to-do-col" class="to-do-col"></div>
+                <div id="in-progress-col" class="in-progress-col"></div>
+                <div id="done-col" class="done-col"></div>
+            </div>
+
+            <!-- UI for delete function -->
+            <div id="trash" class="trash">Drag & Trash</div>
+        </main>
+    </body>
 </html>
