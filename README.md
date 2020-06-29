@@ -6,12 +6,13 @@ A project to learn modern web development and improve programming skills. Includ
 2. Tic Tac Toe [demo (desktop)](https://str4ywolf.github.io/tic-tac-toe/) | [code](https://github.com/Str4yWolf/tic-tac-toe)
 3. Chat
 4. Kanban
+5. Achievements Memo
 
 
 ### WIP
 1. Recipe book
 2. Calculator
-3. AchievementsList
+3. AchievementsList (more like checklist)
 
 
 ### Ideas
