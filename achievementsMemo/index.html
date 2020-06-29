@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Achievements Memo</title>
+  </head>
+  <script>
+    const LOCAL_STORAGE_KEY = "achievements-memo";
+
+    // Setup document
+    document.addEventListener("DOMContentLoaded", () => {
+      document
+        .getElementById("new-item-txt")
+        .addEventListener("keypress", (e) => {
+          if (e.code === "Enter") onSubmit();
+        });
+      document.getElementById("new-item-btn").addEventListener("click", () => {
+        onSubmit();
+      });
+
+      loadData();
+    });
+
+    // Loads user data
+    const loadData = () => {
+      let achievementsList = JSON.parse(
+        localStorage.getItem(LOCAL_STORAGE_KEY)
+      );
+      if (achievementsList === null) return;
+
+      let divList = generateTextDivs(achievementsList);
+      let parentContainer = document.getElementById("list");
+      divList.forEach((item) => parentContainer.appendChild(item));
+    };
+
+    // Saves user data
+    const saveData = () => {
+      let textDivNodes = document.getElementById("list").childNodes;
+      let textDivArr = Array.from(textDivNodes);
+      let strList = textDivArr.map((div) => readTextFromDiv(div));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(strList));
+    };
+
+    /**
+     * Generates a list of text divs from an array of texts.
+     * @param <string[]> strList - The list of items.
+     * @return <HTML object[]> Text divs corresponding to the input.
+     */
+    const generateTextDivs = (strList) => {
+      return strList.map((item) => createTextDiv(item));
+    };
+
+    // Adds an item to the list of achievements
+    // prepends a timestamp by default (parameter)
+    const addItem = (showTimestamp = true) => {
+      let inputField = document.getElementById("new-item-txt");
+      let text = inputField.value;
+
+      let timeStamp = showTimestamp ? getCurrentDateTime() + " - " : "";
+      let newItem = createTextDiv(timeStamp + text);
+
+      let parentContainer = document.getElementById("list");
+      parentContainer.prepend(newItem);
+    };
+
+    // clears the input field
+    const clearInputField = () =>
+      (document.getElementById("new-item-txt").value = "");
+
+    /**
+     * Create a text div with text.
+     * @param <string> text - The text to be shown.
+     * @return <HTML object> The resulting element.
+     */
+    const createTextDiv = (text) => {
+      let container = document.createElement("div");
+      container.innerHTML = text;
+      return container;
+    };
+
+    // returns the text content of a div element
+    const readTextFromDiv = (div) => div.innerHTML;
+
+    // gets current date and time as 'yyyy-mm-dd hh:mm.ss' string
+    const getCurrentDateTime = () => {
+      let UTCDate = new Date(Date.now()).toISOString();
+      let dateTime = UTCDate.split("T");
+
+      return `${dateTime[0]} ${dateTime[1].slice(0, 5)}`;
+    };
+
+    const onSubmit = () => {
+      addItem();
+      saveData();
+      clearInputField();
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .top {
+      background: forestgreen;
+      border-bottom: 3px solid fuchsia;
+      text-align: center;
+      width: 100%;
+    }
+    .top > * {
+      margin: 0.5rem 0.25rem;
+    }
+
+    button,
+    h3,
+    label {
+      color: white;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      max-width: 80rem;
+      min-width: 10rem;
+      width: 50vw;
+    }
+
+    button {
+      background: orange;
+      border: 1px solid orange;
+      font-weight: bold;
+      padding: 0.5rem;
+    }
+
+    .list {
+      margin: 2rem 0;
+    }
+    .list > * {
+      margin: 0.5rem 10vw;
+      padding: 1rem;
+    }
+  </style>
+  <body>
+    <main>
+      <div class="top">
+        <h3>Achievements Memo</h3>
+        <label for="new-item">New Item: </label>
+        <input type="text" name="new-item-txt" id="new-item-txt" />
+        <button type="button" id="new-item-btn">Add</button>
+      </div>
+      <div id="list" class="list"></div>
+    </main>
+  </body>
+</html>
