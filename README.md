@@ -13,6 +13,7 @@ A project to learn modern web development and improve programming skills. Includ
 1. Recipe book
 2. Calculator
 3. AchievementsList (more like checklist)
+4. Snake Game
 
 
 ### Ideas
