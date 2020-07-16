@@ -1,4 +1,4 @@
-export const GRID_DIMENSIONS = 21;
+import { GRID_DIMENSIONS } from "./config.js";
 
 /**
  * Get the next position if it exists given GRID_DIMENSIONS.

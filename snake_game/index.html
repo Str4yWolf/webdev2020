@@ -1,43 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Snake Game</title>
     <script src="game.js" defer type="module"></script>
     <style>
-        * {
-            padding: 0;
-            margin: 0;
-        }
-        body {
-            width: 100vw;
-            height: 100vh;
-            background: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+      * {
+        box-sizing: border-box;
+        font-family: Georgia, "Times New Roman", Times, serif;
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      header {
+        color: white;
+        font-size: 2rem;
+        margin: auto;
+        padding: 1rem;
+      }
 
-        #game-board {
-            display: grid;
-            width: 100vmin;
-            height: 100vmin;
-            background: #ccc;
-        }
+      #game-board {
+        display: grid;
+        width: 88vmin;
+        height: 88vmin;
+        background: #ccc;
+      }
 
-        .snake {
-            background: blue;
-            border: .25vmin solid black;
-        }
+      .snake {
+        background: blue;
+        border: 0.25vmin solid black;
+      }
 
-        .bait {
-            background: yellow;
-            border: .25vmin solid black;
-        }
+      .bait {
+        background: yellow;
+        border: 0.25vmin solid black;
+      }
+
+      #game-over {
+        background: white;
+        font-size: 2rem;
+        margin: auto;
+        padding: 3rem 4rem;
+        position: absolute;
+        text-align: center;
+        z-index: -1;
+      }
+      #game-over > h2 {
+        margin-bottom: 1rem;
+      }
+      #game-over > button {
+        background: forestgreen;
+        border: none;
+        color: white;
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 1rem;
+        padding: 1rem 4rem;
+      }
+
+      #game-over > button:hover {
+        cursor: pointer;
+        opacity: 0.8;
+      }
     </style>
-</head>
-<body>
-    <div id="game-board" />
-</body>
+  </head>
+  <body>
+    <header>
+      <div>
+        <span>Score: </span>
+        <span id="score">0</span>
+      </div>
+      <div>
+        <span>Time: </span>
+        <span id="time">0s</span>
+      </div>
+    </header>
+    <main>
+      <div id="game-board" />
+    </main>
+    <div id="game-over">
+      <h2>Game Over</h2>
+      <button id="restart" type="button">Restart</button>
+    </div>
+  </body>
 </html>

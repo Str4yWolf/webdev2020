@@ -1,16 +1,40 @@
 import { SNAKE_SPEED } from "./snake.js";
-import { GRID_DIMENSIONS, getNextPosition, getRandomPosition } from "./grid.js";
+import { getNextPosition, getRandomPosition } from "./grid.js";
+import { OPPOSITE_MOVE_DIRECTION } from "./constants.js";
+import {
+  INITIAL_MOVE_DIRECTION,
+  RERENDER_TIME,
+  GRID_DIMENSIONS,
+} from "./config.js";
+
+const GAME_BOARD = document.getElementById("game-board");
+const SCORE_LABEL = document.getElementById("score");
+const TIME_LABEL = document.getElementById("time");
+const GAME_OVER_MESSAGE = document.getElementById("game-over");
+const RESTART_BTN = document.getElementById("restart");
 
 document.addEventListener("DOMContentLoaded", () => {
+  {
+    let gridTemplateDim = `repeat(${GRID_DIMENSIONS}, 1fr)`;
+    GAME_BOARD.style.gridTemplate = `${gridTemplateDim} / ${gridTemplateDim}`;
+  }
+
   initialize();
+
+  RESTART_BTN.addEventListener("click", () => {
+    restart();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.code === "Enter") {
+      let zIndex = GAME_OVER_MESSAGE.style.zIndex;
+      console.log(zIndex);
+      let isGameOver = zIndex && zIndex >= 0;
+      if (isGameOver) restart();
+    }
+  });
 });
 
-const OPPOSITE_MOVE_DIRECTION = {
-  up: "down",
-  right: "left",
-  down: "up",
-  left: "right",
-};
 document.addEventListener("keydown", (e) => {
   let newMoveDirection;
   switch (e.code) {
@@ -30,6 +54,8 @@ document.addEventListener("keydown", (e) => {
     case "KeyA":
       newMoveDirection = "left";
       break;
+    default:
+      return;
   }
   // capture illegal move
   if (
@@ -40,15 +66,16 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-const GAME_BOARD = document.getElementById("game-board");
-let snakePositions = [];
-let baitPosition = [];
-let moveDirection = "right";
-let lastMoveDirection = "right";
+var snakePositions = [];
+var baitPosition = [];
+var moveDirection;
+var lastMoveDirection;
 
-let lastRenderTime = 0;
-let rerenderTime = 200;
-let score = 0;
+var lastRenderTime = 0;
+var score;
+var startTime;
+
+var rerenderTime;
 
 const main = (currentTime) => {
   window.requestAnimationFrame(main);
@@ -62,23 +89,40 @@ const main = (currentTime) => {
 window.requestAnimationFrame(main);
 
 const initialize = () => {
-  GAME_BOARD.style.gridTemplate = `repeat(${21}, 1fr) / repeat(${GRID_DIMENSIONS}, 1fr)`;
+  snakePositions = [];
   snakePositions.push([1, 1]);
+  moveDirection = INITIAL_MOVE_DIRECTION;
+  lastMoveDirection = INITIAL_MOVE_DIRECTION;
   setBait();
   draw();
+  score = 0;
+  SCORE_LABEL.innerHTML = score;
+  rerenderTime = RERENDER_TIME;
+  startTime = Date.now();
 };
 
 const update = () => {
   moveSnake();
   draw();
+  updateTime();
 };
 
+const updateTime = () => {
+  let timeDiff = Date.now() - startTime;
+  timeDiff /= 1000;
+  TIME_LABEL.innerHTML = timeDiff.toFixed(1) + "s";
+};
 const gameOver = () => {
+  GAME_OVER_MESSAGE.style.zIndex = "1";
   rerenderTime = Number.MAX_SAFE_INTEGER;
   window.cancelAnimationFrame(main);
-  alert(`Game over\nScore: ${score}`);
 };
 
+const restart = () => {
+  GAME_OVER_MESSAGE.style.zIndex = "-1";
+  initialize();
+  window.requestAnimationFrame(main);
+};
 const draw = () => {
   drawSnake();
   drawBait();
@@ -109,6 +153,7 @@ const hitBait = () => {
  */
 const levelUp = () => {
   score++;
+  SCORE_LABEL.innerHTML = score;
   setBait();
 };
 
